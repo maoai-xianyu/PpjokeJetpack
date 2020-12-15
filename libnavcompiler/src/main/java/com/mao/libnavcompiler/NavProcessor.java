@@ -32,7 +32,7 @@ import javax.tools.StandardLocation;
 /**
  * @author zhangkun
  * @time 2020/9/20 10:53 PM
- * @Description
+ * @Description 注解处理器
  */
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -48,9 +48,11 @@ public class NavProcessor extends AbstractProcessor {
         super.init(processingEnvironment);
         // 打印日志
         messager = processingEnv.getMessager();
+        // 生成文件
         filer = processingEnv.getFiler();
     }
 
+    // 主要方法
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         Set<? extends Element> fragmentElements = roundEnvironment.getElementsAnnotatedWith(FragmentDestination.class);

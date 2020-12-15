@@ -11,10 +11,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface FragmentDestination {
 
+    // 调转链接
     String pageUrl();
-
+    // 是否需要登录
     boolean needLogin() default false;
-
+    // 是否作为第一个页面
     boolean asStarter() default false;
 
 }
