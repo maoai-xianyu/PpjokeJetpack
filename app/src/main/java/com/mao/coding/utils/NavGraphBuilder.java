@@ -21,6 +21,7 @@ public class NavGraphBuilder {
 
         //NavGraphNavigator也是页面路由导航器的一种，只不过他比较特殊。
         //它只为默认的展示页提供导航服务,但真正的跳转还是交给对应的navigator来完成的
+        //需要将下面创建好的fragment 或者 activity 添加给 NavGraph 对象
         NavGraph navGraph = new NavGraph(new NavGraphNavigator(provider));
 
         //FragmentNavigator fragmentNavigator = provider.getNavigator(FragmentNavigator.class);
@@ -55,7 +56,7 @@ public class NavGraphBuilder {
                 navGraph.setStartDestination(node.id);
             }
         }
-
+        // 设置给页面导航控制器
         controller.setGraph(navGraph);
     }
 }

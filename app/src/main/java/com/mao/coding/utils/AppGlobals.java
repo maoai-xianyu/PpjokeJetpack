@@ -3,6 +3,7 @@ package com.mao.coding.utils;
 import android.app.Application;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * 这种方式获取全局的Application 是一种拓展思路。
@@ -12,14 +13,18 @@ import java.lang.reflect.InvocationTargetException;
  * 这种一次反射就能获取全局Application对象的方式相比于在Application#OnCreate保存一份的方式显示更加通用了
  */
 public class AppGlobals {
+
     private static Application sApplication;
 
     public static Application getApplication() {
         if (sApplication == null) {
             try {
-                sApplication = (Application) Class.forName("android.app.ActivityThread")
+
+                Method method = Class.forName("android.app.ActivityThread").getMethod("currentApplication");
+                sApplication = (Application) method.invoke(null, null);
+               /* sApplication = (Application) Class.forName("android.app.ActivityThread")
                         .getMethod("currentApplication")
-                        .invoke(null, (Object[]) null);
+                        .invoke(null, (Object[]) null);*/
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {

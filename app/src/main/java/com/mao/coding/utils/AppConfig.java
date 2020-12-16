@@ -18,6 +18,7 @@ public class AppConfig {
     private static HashMap<String, Destination> sDestConfig;
     private static BottomBar sBottomBar;
 
+    // 解析文件对象
     public static HashMap<String, Destination> getDestConfig() {
         if (sDestConfig == null) {
             String content = parseFile("destination.json");
@@ -35,6 +36,7 @@ public class AppConfig {
         return sBottomBar;
     }
 
+    // 获取 AssetManager 读取assets目录下的文件
     private static String parseFile(String fileName) {
         AssetManager assets = AppGlobals.getApplication().getAssets();
         InputStream is = null;
