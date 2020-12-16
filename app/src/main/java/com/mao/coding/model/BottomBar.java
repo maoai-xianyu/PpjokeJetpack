@@ -29,7 +29,7 @@ public class BottomBar {
         public boolean enable;
         public int index;
         public String pageUrl;
-        public String title;
-        public String tintColor;
+        public String title; // tab 名字，可以为空
+        public String tintColor; // 默认着色
     }
 }

@@ -41,6 +41,7 @@ public class AppBottomBar extends BottomNavigationView {
         int[][] state = new int[2][];
         state[0] = new int[]{android.R.attr.state_selected};
         state[1] = new int[]{};
+        // 第一个是按钮被选中的颜色，第二个是按钮常规的颜色
         int[] colors = new int[]{Color.parseColor(config.activeColor), Color.parseColor(config.inActiveColor)};
         ColorStateList stateList = new ColorStateList(state, colors);
         setItemTextColor(stateList);
