@@ -38,6 +38,7 @@ public class AppBottomBar extends BottomNavigationView {
 
         config = AppConfig.getBottomBarConfig();
 
+        // 选中和未被选中的两种状态的颜色
         int[][] state = new int[2][];
         state[0] = new int[]{android.R.attr.state_selected};
         state[1] = new int[]{};
@@ -60,7 +61,11 @@ public class AppBottomBar extends BottomNavigationView {
             if (itemId < 0) {
                 continue;
             }
+            // 每次add item 的时候， BottomNavigationView 都会清除之前所有的item,进行重新添加。
+            // 因为 BottomNavigationView 会对按钮进行重新排序
+            // 会将所有的 MenuItem 放入 BottomNavigationMenuView  进行管理 对应的就是 BottomNavigationItemView
             MenuItem menuItem = getMenu().add(0, itemId, tab.index, tab.title);
+            // 给menu icon 设置按钮
             menuItem.setIcon(sIcons[tab.index]);
         }
 
@@ -77,10 +82,14 @@ public class AppBottomBar extends BottomNavigationView {
             }
 
             int iconSize = dp2Px(tab.size);
+            // BottomNavigationView 的所有的 MenuItem 都是添加到 BottomNavigationMenuView 上
             BottomNavigationMenuView menuView = (BottomNavigationMenuView) getChildAt(0);
+            // 获取对应的 BottomNavigationItemView
             BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(index);
+            // 改变按钮的大小
             itemView.setIconSize(iconSize);
             if (TextUtils.isEmpty(tab.title)) {
+                // 中间大按钮进行着色
                 int tintColor = TextUtils.isEmpty(tab.tintColor) ? Color.parseColor("#ff678f") : Color.parseColor(tab.tintColor);
                 itemView.setIconTintList(ColorStateList.valueOf(tintColor));
                 //禁止掉点按时 上下浮动的效果
