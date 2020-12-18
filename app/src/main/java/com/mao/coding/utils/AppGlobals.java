@@ -21,7 +21,7 @@ public class AppGlobals {
             try {
 
                 Method method = Class.forName("android.app.ActivityThread").getMethod("currentApplication");
-                sApplication = (Application) method.invoke(null, null);
+                sApplication = (Application) method.invoke(null, (Object[]) null);
                /* sApplication = (Application) Class.forName("android.app.ActivityThread")
                         .getMethod("currentApplication")
                         .invoke(null, (Object[]) null);*/

@@ -13,19 +13,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 @FragmentDestination(pageUrl = "main/tabs/my", needLogin = true)
 public class MyFragment extends Fragment {
 
 
-    private MyFragment myViewModel;
+    private MyViewModel myViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
         ViewGroup container, Bundle savedInstanceState) {
-        myViewModel =
-            ViewModelProviders.of(this).get(MyViewModel.class);
+        myViewModel = new ViewModelProvider(this).get(MyViewModel.class);
         View root = inflater.inflate(R.layout.fragment_my, container, false);
         final TextView textView = root.findViewById(R.id.text_my);
         myViewModel.getText().observe(this, new Observer<String>() {
