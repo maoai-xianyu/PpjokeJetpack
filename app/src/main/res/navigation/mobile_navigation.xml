@@ -5,31 +5,45 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
 
+
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.mao.coding.ui.home.HomeFragment"
         android:label="@string/title_home"
+        android:name="com.mao.coding.ui.home.HomeFragment"
         tools:layout="@layout/fragment_home">
-        <argument
-            android:name="arg1"
-            app:argType="boolean" />
         <action
             android:id="@+id/id_action"
             app:destination="@id/navigation_dashboard" />
+        <argument
+            android:name="arg1"
+            app:argType="boolean" />
         <deepLink
             android:id="@+id/deepLink"
             app:uri="www.mooc.com" />
     </fragment>
 
+
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.mao.coding.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
+        android:name="com.mao.coding.ui.dashboard.DashboardFragment"
         tools:layout="@layout/fragment_dashboard" />
+
+    <activity
+        android:id="@+id/navigation_publish"
+        android:name="com.mao.coding.ui.publish.PublishActivity"
+        tools:layout="@layout/fragment_notifications" />
+
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.mao.coding.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
+        android:name="com.mao.coding.ui.notifications.NotificationsFragment"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_my"
+        android:label="@string/title_notifications"
+        android:name="com.mao.coding.ui.my.MyFragment"
+        tools:layout="@layout/fragment_my" />
 </navigation>

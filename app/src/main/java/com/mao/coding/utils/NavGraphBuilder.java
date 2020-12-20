@@ -1,0 +1,60 @@
+package com.mao.coding.utils;
+
+import android.content.ComponentName;
+
+import com.mao.coding.model.Destination;
+import com.mao.coding.navigator.FixFragmentNavigator;
+
+import java.util.HashMap;
+import java.util.Iterator;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.ActivityNavigator;
+import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
+import androidx.navigation.NavGraphNavigator;
+import androidx.navigation.NavigatorProvider;
+import androidx.navigation.fragment.FragmentNavigator;
+
+public class NavGraphBuilder {
+    public static void build(FragmentActivity activity, NavController controller, int containerId) {
+        NavigatorProvider provider = controller.getNavigatorProvider();
+
+        //NavGraphNavigator也是页面路由导航器的一种，只不过他比较特殊。
+        //它只为默认的展示页提供导航服务,但真正的跳转还是交给对应的navigator来完成的
+        //需要将下面创建好的fragment 或者 activity 添加给 NavGraph 对象
+        NavGraph navGraph = new NavGraph(new NavGraphNavigator(provider));
+
+        //FragmentNavigator fragmentNavigator = provider.getNavigator(FragmentNavigator.class);
+        //fragment的导航此处使用我们定制的FixFragmentNavigator，底部Tab切换时 使用hide()/show(),而不是replace()
+        FixFragmentNavigator fragmentNavigator = new FixFragmentNavigator(activity, activity.getSupportFragmentManager(), containerId);
+        // 添加内置导航器
+        provider.addNavigator(fragmentNavigator);
+        ActivityNavigator activityNavigator = provider.getNavigator(ActivityNavigator.class);
+        HashMap<String, Destination> destConfig = AppConfig.getDestConfig();
+        Iterator<Destination> iterator = destConfig.values().iterator();
+        while (iterator.hasNext()) {
+            Destination node = iterator.next();
+            if (node.isFragment) {
+                FragmentNavigator.Destination destination = fragmentNavigator.createDestination();
+                destination.setId(node.id);
+                destination.setClassName(node.className);
+                destination.addDeepLink(node.pageUrl);
+                navGraph.addDestination(destination);
+            } else {
+                ActivityNavigator.Destination destination = activityNavigator.createDestination();
+                destination.setId(node.id);
+                destination.setComponentName(new ComponentName(AppGlobals.getApplication().getPackageName(), node.className));
+                destination.addDeepLink(node.pageUrl);
+                navGraph.addDestination(destination);
+            }
+
+            //给APP页面导航结果图 设置一个默认的展示页的id
+            if (node.asStarter) {
+                navGraph.setStartDestination(node.id);
+            }
+        }
+        // 设置给页面导航控制器
+        controller.setGraph(navGraph);
+    }
+}
