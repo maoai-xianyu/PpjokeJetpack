@@ -10,6 +10,7 @@ import com.mao.coding.utils.NavGraphBuilder;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
@@ -23,10 +24,13 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
+
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
         // 设置这行代码，用于自己解析注解生成器生成的代码，用以改造布局中 fragment 的 navGraph
-        NavGraphBuilder.build(this, navController, 1);
+        NavGraphBuilder.build(this, navController, fragment.getId());
 
         navView.setOnNavigationItemSelectedListener(this);
     }

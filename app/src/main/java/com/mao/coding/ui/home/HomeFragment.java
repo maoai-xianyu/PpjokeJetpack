@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mao.coding.R;
+import com.mao.coding.utils.LogU;
 import com.mao.libnavannotation.FragmentDestination;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
         ViewGroup container, Bundle savedInstanceState) {
+        LogU.d("onCreateView");
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final TextView textView = root.findViewById(R.id.text_home);

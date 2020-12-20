@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mao.coding.R;
+import com.mao.coding.utils.LogU;
 import com.mao.libnavannotation.FragmentDestination;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ public class DashboardFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
         ViewGroup container, Bundle savedInstanceState) {
+        LogU.d("onCreateView");
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
@@ -33,4 +35,5 @@ public class DashboardFragment extends Fragment {
         });
         return root;
     }
+
 }

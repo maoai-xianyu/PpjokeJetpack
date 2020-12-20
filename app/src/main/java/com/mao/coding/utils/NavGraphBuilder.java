@@ -3,6 +3,7 @@ package com.mao.coding.utils;
 import android.content.ComponentName;
 
 import com.mao.coding.model.Destination;
+import com.mao.coding.navigator.FixFragmentNavigator;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,12 +27,9 @@ public class NavGraphBuilder {
 
         //FragmentNavigator fragmentNavigator = provider.getNavigator(FragmentNavigator.class);
         //fragment的导航此处使用我们定制的FixFragmentNavigator，底部Tab切换时 使用hide()/show(),而不是replace()
-        //FixFragmentNavigator fragmentNavigator = new FixFragmentNavigator(activity, activity.getSupportFragmentManager(), containerId);
-        //provider.addNavigator(fragmentNavigator);
-
-
-
-        FragmentNavigator fragmentNavigator = provider.getNavigator(FragmentNavigator.class);
+        FixFragmentNavigator fragmentNavigator = new FixFragmentNavigator(activity, activity.getSupportFragmentManager(), containerId);
+        // 添加内置导航器
+        provider.addNavigator(fragmentNavigator);
         ActivityNavigator activityNavigator = provider.getNavigator(ActivityNavigator.class);
         HashMap<String, Destination> destConfig = AppConfig.getDestConfig();
         Iterator<Destination> iterator = destConfig.values().iterator();
