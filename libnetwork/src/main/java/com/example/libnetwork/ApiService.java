@@ -25,7 +25,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
  */
 public class ApiService {
 
-    private static final OkHttpClient okHttpClient;
+    public static final OkHttpClient okHttpClient;
 
     static {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
