@@ -1,15 +1,23 @@
 package com.example.libnetwork;
 
+import android.util.Log;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import androidx.annotation.IntDef;
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Request.Builder;
+import okhttp3.Response;
 
 /**
  * @author zhangkun
@@ -35,6 +43,7 @@ public abstract class Request<T, R extends Request> {
     public static final int NET_CACHE = 4;
     private String cacheKey;
     private Type mType;
+    private Class mClass;
 
     // 使用注解标记类型
     @IntDef({CACHE_ONLY, CACHE_FIRST, NET_CACHE, NET_ONLY})
@@ -94,20 +103,94 @@ public abstract class Request<T, R extends Request> {
     }
 
     public R responseType(Class claz) {
-        mType = claz;
+        mClass = claz;
         return (R) this;
     }
 
     // 同步
-    public void execute() {
+    public ApiResponse<T> execute() {
+        if (mType == null) {
+            throw new RuntimeException("同步方法,response 返回值 类型必须设置");
+        }
 
+        ApiResponse<T> result = null;
+        try {
+            Response response = getCall().execute();
+            result = parseResponse(response, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (result == null) {
+                result = new ApiResponse<>();
+                result.message = e.getMessage();
+            }
+        }
+        return result;
     }
 
     // 异步
     public void execute(JsonCallback<T> callback) {
-        getCall();
+        getCall().enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                ApiResponse<T> response = new ApiResponse<>();
+                response.message = e.getMessage();
+                callback.onError(response);
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                ApiResponse<T> result = parseResponse(response, callback);
+                if (!result.success) {
+                    callback.onError(result);
+                } else {
+                    callback.onSuccess(result);
+                }
+
+            }
+        });
     }
 
+    private ApiResponse<T> parseResponse(Response response, JsonCallback<T> callback) {
+        String message = null;
+        int status = response.code();
+        boolean success = response.isSuccessful();
+        ApiResponse<T> result = new ApiResponse<>();
+        Convert convert = ApiService.sConvert;
+        try {
+            String content = response.body().string();
+            if (success) {
+                if (callback != null) {
+                    // 获取泛型的实际类型 ParameterizedType 是 Type 的子类
+                    ParameterizedType type = (ParameterizedType) callback.getClass().getGenericSuperclass();
+                    Type argument = type.getActualTypeArguments()[0];
+                    result.body = (T) convert.convert(content, argument);
+                } else if (mType != null) {
+                    result.body = (T) convert.convert(content, mType);
+                } else if (mClass != null) {
+                    result.body = (T) convert.convert(content, mClass);
+                } else {
+                    Log.e("request", "parseResponse: 无法解析 ");
+                }
+            } else {
+                message = content;
+            }
+
+        } catch (Exception e) {
+            message = e.getMessage();
+            success = false;
+            status = 0;
+
+        }
+
+        result.success = success;
+        result.status = status;
+        result.message = message;
+
+        return result;
+
+    }
+
+    // 构建网络请求
     private Call getCall() {
         okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
         // 为 okhttp3 添加请求头

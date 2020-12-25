@@ -25,7 +25,9 @@ import okhttp3.logging.HttpLoggingInterceptor;
  */
 public class ApiService {
 
-    public static final OkHttpClient okHttpClient;
+    protected static final OkHttpClient okHttpClient;
+    protected static String sBaseUrl;
+    protected static Convert sConvert;
 
     static {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -75,6 +77,19 @@ public class ApiService {
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 初始化 baseUrl 和 类型转换
+     * @param baseUrl https://api.github.com/ or http://api.github.com/
+     * @param convert 自定义类型转换
+     */
+    public static void init(String baseUrl, Convert convert) {
+        sBaseUrl = baseUrl;
+        if (convert == null) {
+            convert = new JsonConvert();
+        }
+        sConvert = convert;
     }
 
 }
