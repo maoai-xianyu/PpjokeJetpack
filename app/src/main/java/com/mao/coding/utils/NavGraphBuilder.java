@@ -2,6 +2,7 @@ package com.mao.coding.utils;
 
 import android.content.ComponentName;
 
+import com.example.libcommon.AppGlobals;
 import com.mao.coding.model.Destination;
 import com.mao.coding.navigator.FixFragmentNavigator;
 
