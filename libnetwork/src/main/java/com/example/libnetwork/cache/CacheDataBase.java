@@ -49,6 +49,9 @@ public abstract class CacheDataBase extends RoomDatabase {
             .build();
     }
 
+
+    public abstract CacheDao getCache();
+
     public static CacheDataBase get(){
         return cacheDataBase;
     }
