@@ -1,4 +1,4 @@
-package com.mao.coding.utils;
+package com.example.libcommon;
 
 import android.app.Application;
 
