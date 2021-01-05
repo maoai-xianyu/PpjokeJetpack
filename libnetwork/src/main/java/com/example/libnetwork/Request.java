@@ -1,10 +1,15 @@
 package com.example.libnetwork;
 
+import android.annotation.SuppressLint;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.example.libnetwork.cache.CacheManager;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
@@ -14,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.arch.core.executor.ArchTaskExecutor;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request.Builder;
@@ -25,7 +32,7 @@ import okhttp3.Response;
  * @Description T 是 response 的实体类型
  * R 是 Request 的子类
  */
-public abstract class Request<T, R extends Request> {
+public abstract class Request<T, R extends Request> implements Cloneable{
 
     protected String mUrl;
     // 存储请求的header
@@ -44,6 +51,7 @@ public abstract class Request<T, R extends Request> {
     private String cacheKey;
     private Type mType;
     private Class mClass;
+    private int mCacheStrategy = NET_ONLY; // 策略类型
 
     // 使用注解标记类型
     @IntDef({CACHE_ONLY, CACHE_FIRST, NET_CACHE, NET_ONLY})
@@ -91,6 +99,12 @@ public abstract class Request<T, R extends Request> {
         return (R) this;
     }
 
+    public R cacheStrategy(@CacheStrategy int cacheStrategy) {
+        mCacheStrategy = cacheStrategy;
+        return (R) this;
+    }
+
+
     // 允许指定 cacheKey
     public R cacheKey(String key) {
         this.cacheKey = key;
@@ -107,10 +121,34 @@ public abstract class Request<T, R extends Request> {
         return (R) this;
     }
 
+
+    // 构建网络请求
+    private Call getCall() {
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
+        // 为 okhttp3 添加请求头
+        addHeaders(builder);
+        // 构造 requestBody  GET POST 需要通过子类构建
+        okhttp3.Request request = generateRequest(builder);
+        Call call = ApiService.okHttpClient.newCall(request);
+        return call;
+    }
+
+    protected abstract okhttp3.Request generateRequest(Builder builder);
+
+    private void addHeaders(okhttp3.Request.Builder builder) {
+        for (Entry<String, String> entry : headers.entrySet()) {
+            builder.addHeader(entry.getKey(), entry.getValue());
+        }
+    }
+
     // 同步
     public ApiResponse<T> execute() {
         if (mType == null) {
             throw new RuntimeException("同步方法,response 返回值 类型必须设置");
+        }
+
+        if (mCacheStrategy == CACHE_ONLY) {
+            return readCache();
         }
 
         ApiResponse<T> result = null;
@@ -127,27 +165,56 @@ public abstract class Request<T, R extends Request> {
         return result;
     }
 
-    // 异步
-    public void execute(JsonCallback<T> callback) {
-        getCall().enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                ApiResponse<T> response = new ApiResponse<>();
-                response.message = e.getMessage();
-                callback.onError(response);
-            }
+    // 读取缓存
+    private ApiResponse<T> readCache() {
+        String key = TextUtils.isEmpty(cacheKey) ? generateCacheKey() : cacheKey;
+        Object cache = CacheManager.getCache(key);
+        ApiResponse<T> result = new ApiResponse<>();
+        result.status = 304;
+        result.message = "缓存获取成功";
+        result.body = (T) cache;
+        result.success = true;
+        return result;
 
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                ApiResponse<T> result = parseResponse(response, callback);
-                if (!result.success) {
-                    callback.onError(result);
-                } else {
-                    callback.onSuccess(result);
+    }
+
+    // 异步
+    @SuppressLint("RestrictedApi")
+    public void execute(JsonCallback<T> callback) {
+        if (mCacheStrategy != NET_ONLY) {
+            ArchTaskExecutor.getIOThreadExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    ApiResponse<T> response = readCache();
+                    if (callback != null && response.body != null) {
+                        callback.onCacheSuccess(response);
+                    }
+
+                }
+            });
+        }
+
+        if (mCacheStrategy != CACHE_ONLY) {
+            getCall().enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    ApiResponse<T> response = new ApiResponse<>();
+                    response.message = e.getMessage();
+                    callback.onError(response);
                 }
 
-            }
-        });
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    ApiResponse<T> result = parseResponse(response, callback);
+                    if (!result.success) {
+                        callback.onError(result);
+                    } else {
+                        callback.onSuccess(result);
+                    }
+
+                }
+            });
+        }
     }
 
     private ApiResponse<T> parseResponse(Response response, JsonCallback<T> callback) {
@@ -186,26 +253,28 @@ public abstract class Request<T, R extends Request> {
         result.status = status;
         result.message = message;
 
+        if (mCacheStrategy != NET_ONLY && result.success && result.body != null && result.body instanceof Serializable) {
+            saveCache(result.body);
+        }
+
         return result;
 
     }
 
-    // 构建网络请求
-    private Call getCall() {
-        okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
-        // 为 okhttp3 添加请求头
-        addHeaders(builder);
-        // 构造 requestBody  GET POST 需要通过子类构建
-        okhttp3.Request request = generateRequest(builder);
-        Call call = ApiService.okHttpClient.newCall(request);
-        return call;
+    private void saveCache(T body) {
+        String key = TextUtils.isEmpty(cacheKey) ? generateCacheKey() : cacheKey;
+        CacheManager.save(key, body);
     }
 
-    protected abstract okhttp3.Request generateRequest(Builder builder);
-
-    private void addHeaders(okhttp3.Request.Builder builder) {
-        for (Entry<String, String> entry : headers.entrySet()) {
-            builder.addHeader(entry.getKey(), entry.getValue());
-        }
+    private String generateCacheKey() {
+        cacheKey = UrlCreator.createUrlFromParams(mUrl, params);
+        return cacheKey;
     }
+
+    @NonNull
+    @Override
+    public Request clone() throws CloneNotSupportedException {
+        return (Request<T, R>) super.clone();
+    }
+
 }
