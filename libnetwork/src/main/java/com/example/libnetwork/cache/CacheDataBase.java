@@ -1,6 +1,6 @@
 package com.example.libnetwork.cache;
 
-import com.example.libcommon.AppGlobals;
+import com.example.libcommon.global.AppGlobals;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
