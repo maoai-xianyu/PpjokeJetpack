@@ -24,5 +24,6 @@ public class Ugc implements Serializable {
     public int commentCount;
     public boolean hasFavorite;
     public boolean hasdiss;
+    public boolean hasLiked;
 
 }

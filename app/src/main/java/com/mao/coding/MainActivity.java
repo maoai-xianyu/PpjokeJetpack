@@ -4,14 +4,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import com.example.libnetwork.ApiResponse;
-import com.example.libnetwork.GetRequest;
-import com.example.libnetwork.JsonCallback;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomnavigation.BottomNavigationView.OnNavigationItemSelectedListener;
 import com.mao.coding.utils.NavGraphBuilder;
-
-import org.json.JSONObject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,15 +34,15 @@ public class MainActivity extends AppCompatActivity implements OnNavigationItemS
 
         navView.setOnNavigationItemSelectedListener(this);
 
-        GetRequest<JSONObject> request = new GetRequest<>("www.mooc.com");
-        request.execute();
+        /*GetRequest<JSONObject> request = new GetRequest<>("http://www.mooc.com");
+        //request.execute();
 
         request.execute(new JsonCallback<JSONObject>() {
             @Override
             public void onSuccess(ApiResponse<JSONObject> response) {
                 super.onSuccess(response);
             }
-        });
+        });*/
 
     }
 

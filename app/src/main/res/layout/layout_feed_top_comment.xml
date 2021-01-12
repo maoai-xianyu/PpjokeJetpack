@@ -13,17 +13,18 @@
             name="lifeCycleOwner"
             type="androidx.lifecycle.LifecycleOwner" />
 
-        <import type="com.mooc.ppjoke.ui.InteractionPresenter" />
+        <!--<import type="com.mooc.ppjoke.ui.InteractionPresenter" />-->
 
-        <import type="android.text.TextUtils"></import>
+        <import type="android.text.TextUtils"/>
 
-        <import type="android.view.View"></import>
+        <import type="android.view.View"/>
 
-        <import type="com.mooc.ppjoke.utils.StringConvert"></import>
+        <import type="com.mao.coding.utils.StringConvert" />
 
     </data>
 
-    <com.mooc.libcommon.view.CornerFrameLayout
+
+    <!--<com.example.libcommon.view.CornerFrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/dp_16"
@@ -35,7 +36,17 @@
         android:paddingBottom="@dimen/dp_10"
         android:visibility="@{comment==null?View.GONE:View.VISIBLE}"
         app:clip_radius="6dp"
-        app:clip_side="all">
+        app:clip_side="all">-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_16"
+        android:layout_marginRight="@dimen/dp_16"
+        android:background="@color/color_gray"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dp_10"
+        android:paddingRight="@dimen/dp_10"
+        android:paddingBottom="@dimen/dp_10">
 
 
         <ImageView
@@ -43,7 +54,7 @@
             android:layout_height="@dimen/dp_60"
             android:layout_gravity="right|top"
             android:layout_marginRight="@dimen/dp_10"
-            android:src="@drawable/icon_god_comment2"></ImageView>
+            android:src="@drawable/icon_god_comment2"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,16 +67,13 @@
                 android:layout_marginTop="@dimen/dp_10"
                 android:orientation="horizontal">
 
-
-                <com.mooc.ppjoke.view.PPImageView
+                <com.mao.coding.view.PPImageView
                     android:id="@+id/avatar"
                     android:layout_width="@dimen/dp_20"
                     android:layout_height="@dimen/dp_20"
                     app:image_url="@{comment.author.avatar}"
                     app:isCircle="@{true}"
-                    tools:src="@mipmap/ic_launcher_round">
-
-                </com.mooc.ppjoke.view.PPImageView>
+                    tools:src="@mipmap/ic_launcher_round"/>
 
                 <TextView
                     android:id="@+id/user_name"
@@ -77,12 +85,12 @@
                     android:text="@{comment.author.name}"
                     android:textColor="@color/color_3d3"
                     android:textSize="@dimen/sp_12"
-                    tools:text="神秘的jetpack"></TextView>
+                    tools:text="神秘的jetpack"/>
 
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="1px"
-                    android:layout_weight="1"></Space>
+                    android:layout_weight="1"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -91,31 +99,38 @@
                     android:text="@{comment.ugc.likeCount>0?StringConvert.convertFeedUgc(comment.ugc.likeCount):null}"
                     android:textColor="@{comment.ugc.hasLiked?@color/color_theme:@color/color_3d3}"
                     android:textSize="@dimen/sp_12"
-                    tools:text="1000"></TextView>
+                    tools:text="1000"/>
 
-                <ImageView
+                <!--<ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dp_2"
                     android:onClick="@{()->InteractionPresenter.toggleCommentLike(lifeCycleOwner,comment)}"
                     android:src="@{comment.ugc.hasLiked?@drawable/icon_cell_liked:@drawable/icon_cell_like}"
-                    tools:src="@drawable/icon_cell_liked">
+                    tools:src="@drawable/icon_cell_liked"/>-->
 
-                </ImageView>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_2"
+                    android:src="@{comment.ugc.hasLiked?@drawable/icon_cell_liked:@drawable/icon_cell_like}"
+                    tools:src="@drawable/icon_cell_liked"/>
+
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_10"
-                android:layout_marginRight="@dimen/dp_36"
+                android:layout_marginEnd="@dimen/dp_36"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="@{comment.commentText}"
                 android:textColor="@color/color_3d3"
                 android:textSize="@dimen/sp_14"
                 android:visibility="@{TextUtils.isEmpty(comment.commentText)?View.GONE:View.VISIBLE}"
-                tools:text="神秘的JetPack神秘的JetPack神秘的JetPack"></TextView>
+                tools:text="神秘的JetPack神秘的JetPack神秘的JetPack"/>
 
             <FrameLayout
                 android:layout_width="80dp"
@@ -123,7 +138,7 @@
                 android:layout_marginTop="@dimen/dp_10"
                 android:visibility="@{TextUtils.isEmpty(comment.imageUrl)?View.GONE:View.VISIBLE}">
 
-                <com.mooc.ppjoke.view.PPImageView
+                <com.mao.coding.view.PPImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
@@ -131,16 +146,24 @@
                     android:visibility="@{TextUtils.isEmpty(comment.imageUrl)?View.GONE:View.VISIBLE}"
                     app:image_url="@{comment.imageUrl}"
                     app:isCircle="@{false}"
-                    tools:src="@mipmap/ic_launcher"></com.mooc.ppjoke.view.PPImageView>
+                    tools:src="@mipmap/ic_launcher"/>
+
+               <!-- <ImageView
+                    android:layout_width="@dimen/dp_20"
+                    android:layout_height="@dimen/dp_20"
+                    android:layout_gravity="center"
+                    android:src="@drawable/icon_video_play"
+                    android:visibility="@{TextUtils.isEmpty(comment.videoUrl)?View.GONE:View.VISIBLE}"/>-->
+
 
                 <ImageView
                     android:layout_width="@dimen/dp_20"
                     android:layout_height="@dimen/dp_20"
                     android:layout_gravity="center"
                     android:src="@drawable/icon_video_play"
-                    android:visibility="@{TextUtils.isEmpty(comment.videoUrl)?View.GONE:View.VISIBLE}"></ImageView>
+                    android:visibility="@{comment.commentType==2?View.GONE:View.VISIBLE}" />
             </FrameLayout>
 
         </LinearLayout>
-    </com.mooc.libcommon.view.CornerFrameLayout>
+    </FrameLayout>
 </layout>
