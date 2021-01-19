@@ -50,6 +50,25 @@ dependencies {
 
     //包含了 viewmodel 和 livedata
     api 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    //或者指明使用viewmodel
+    //api "androidx.lifecycle:lifecycle-viewmodel:2.1.0"
+    //或者指明使用livedata
+    //api 'androidx.lifecycle:lifecycle-livedata:2.1.0'
+    //api 'androidx.lifecycle:lifecycle-livedata-core:2.1.0'
+    //注解使用生命周期编译器
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.2.0"
+
+    //paging分页组件
+    api 'androidx.paging:paging-runtime:2.1.2'
+
+    //页面刷新组件
+    api 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
+    api 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0'
+
+    //视频播放组件
+    api 'com.google.android.exoplayer:exoplayer-core:2.11.1'
+    api 'com.google.android.exoplayer:exoplayer-dash:2.10.4'
+    api 'com.google.android.exoplayer:exoplayer-ui:2.10.4'
 
     //room数据库
     api 'android.arch.persistence.room:runtime:1.1.1'
