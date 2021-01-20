@@ -2,12 +2,15 @@ package com.mao.coding.model;
 
 import java.io.Serializable;
 
+import androidx.annotation.Nullable;
+
 /**
  * @author zhangkun
  * @time 2021/1/6 9:50 AM
  * @Description
  */
 public class Comment implements Serializable {
+
     /**
      * id : 784
      * itemId : 6739143063064549000
@@ -43,5 +46,18 @@ public class Comment implements Serializable {
     public boolean hasLiked;
     public User author;
     public Ugc ugc;
+
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null || !(obj instanceof Comment)) {
+            return false;
+        }
+        Comment newComment = (Comment) obj;
+        return likeCount == newComment.likeCount
+            && hasLiked == newComment.hasLiked
+            && (author != null && author.equals(newComment.author))
+            && (ugc != null && ugc.equals(newComment.ugc));
+    }
 
 }
