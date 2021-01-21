@@ -24,8 +24,9 @@ public class FeedAdapter extends PagedListAdapter<Feed, FeedAdapter.ViewHolder> 
 
     private final LayoutInflater inflater;
     private final Context mContext;
+    private String mCategory;
 
-    public FeedAdapter(Context context) {
+    public FeedAdapter(Context context,String category) {
         super(new ItemCallback<Feed>() {
 
             // 两个item 是不是同一个
@@ -41,6 +42,7 @@ public class FeedAdapter extends PagedListAdapter<Feed, FeedAdapter.ViewHolder> 
             }
         });
         mContext = context;
+        mCategory = category;
         inflater = LayoutInflater.from(context);
     }
 
@@ -67,6 +69,8 @@ public class FeedAdapter extends PagedListAdapter<Feed, FeedAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
+        holder.bindData(getItem(position));
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -76,6 +80,18 @@ public class FeedAdapter extends PagedListAdapter<Feed, FeedAdapter.ViewHolder> 
         public ViewHolder(@NonNull View itemView, ViewDataBinding binding) {
             super(itemView);
             this.mBinding = binding;
+        }
+
+        public void bindData(Feed item) {
+            if (mBinding instanceof LayoutFeedTypeImageBinding) {
+                LayoutFeedTypeImageBinding typeImageBinding = (LayoutFeedTypeImageBinding) mBinding;
+                typeImageBinding.setFeed(item);
+                typeImageBinding.feedImage.bindData(item.width, item.height, 16, item.cover) ;
+            }else {
+                LayoutFeedTypeVideoBinding typeVideoBinding = (LayoutFeedTypeVideoBinding) mBinding;
+                typeVideoBinding.setFeed(item);
+                typeVideoBinding.listPlayerView.bindData(mCategory,item.width,item.height,item.cover,item.url);
+            }
         }
     }
 }
