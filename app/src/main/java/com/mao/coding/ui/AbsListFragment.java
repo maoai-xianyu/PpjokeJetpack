@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 /**
  * @author zhangkun
  * @time 2021/1/18 8:54 PM
- * @Description
+ * @Description 设置通用的配置
  */
 public abstract class AbsListFragment<T> extends Fragment implements OnLoadMoreListener, OnRefreshListener {
 

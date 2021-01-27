@@ -1,19 +1,96 @@
 package com.mao.coding.ui.home;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import com.alibaba.fastjson.TypeReference;
+import com.example.libnetwork.ApiResponse;
+import com.example.libnetwork.ApiService;
+import com.example.libnetwork.JsonCallback;
+import com.example.libnetwork.Request;
+import com.mao.coding.model.Feed;
+import com.mao.coding.ui.AbsViewModel;
+import com.mao.coding.utils.LogU;
 
-public class HomeViewModel extends ViewModel {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    private MutableLiveData<String> mText;
+import androidx.annotation.NonNull;
+import androidx.paging.DataSource;
+import androidx.paging.ItemKeyedDataSource;
 
-    public HomeViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+public class HomeViewModel extends AbsViewModel<Feed> {
+
+
+    private volatile boolean witchCache = true;
+
+
+    @Override
+    public DataSource createDataSource() {
+        return mDataSource;
     }
 
-    public LiveData<String> getText() {
-        return mText;
+
+    ItemKeyedDataSource<Integer, Feed> mDataSource = new ItemKeyedDataSource<Integer, Feed>() {
+        @Override
+        public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Feed> callback) {
+            //加载初始化数据的 执行在主线程
+            LogU.d("当前线程 loadInitial " + Thread.currentThread());
+
+            loadData(0, callback);
+            witchCache = false;
+
+        }
+
+        @Override
+        public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Feed> callback) {
+            //向后加载分页数据的  执行在线程
+            LogU.d("当前线程 loadAfter " + Thread.currentThread());
+
+        }
+
+        @Override
+        public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Feed> callback) {
+            //能够向前加载数据的,比如进入页面的，加载的是的第三页的数据，向上翻动的时候会加载第二页和第一页的数据。一般用不到
+            LogU.d("当前线程 loadBefore " + Thread.currentThread());
+            callback.onResult(Collections.emptyList());
+        }
+
+        @NonNull
+        @Override
+        public Integer getKey(@NonNull Feed item) {
+            //通过最后一条的item的信息，返回Integer对象
+            return item.id;
+        }
+    };
+
+    private void loadData(int key, ItemKeyedDataSource.LoadCallback<Feed> callback) {
+        //feeds/queryHotFeedsList
+        Request request = ApiService.get("/feeds/queryHotFeedsList")
+            .addParam("feedType", null)
+            .addParam("userId", 0)
+            .addParam("feedId", key)
+            .addParam("pageCount", 0)
+            .responseType(new TypeReference<ArrayList<Feed>>() {
+            }.getType());
+
+        if (witchCache) {
+            request.cacheStrategy(Request.CACHE_ONLY);
+            request.execute(new JsonCallback<List<Feed>>() {
+                @Override
+                public void onCacheSuccess(ApiResponse<List<Feed>> response) {
+                }
+            });
+        }
+        try {
+            Request netRequest = witchCache ? request.clone() : request;
+            netRequest.cacheStrategy(key == 0 ? Request.NET_CACHE : Request.NET_ONLY);
+            ApiResponse<List<Feed>> response = netRequest.execute();
+            List<Feed> data = response.body == null ? Collections.emptyList() : response.body;
+
+            callback
+
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
     }
+
 }
