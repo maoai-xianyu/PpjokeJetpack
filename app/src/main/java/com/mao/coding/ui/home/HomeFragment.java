@@ -22,7 +22,7 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 @FragmentDestination(pageUrl = "main/tabs/home", asStarter = true)
-public class HomeFragment extends AbsListFragment<Feed> {
+public class HomeFragment extends AbsListFragment<Feed,HomeViewModel> {
 
     private HomeViewModel homeViewModel;
 

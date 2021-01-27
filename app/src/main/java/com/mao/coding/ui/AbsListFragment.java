@@ -12,9 +12,13 @@ import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,13 +30,16 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
  * @time 2021/1/18 8:54 PM
  * @Description 设置通用的配置
  */
-public abstract class AbsListFragment<T> extends Fragment implements OnLoadMoreListener, OnRefreshListener {
+public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Fragment implements OnLoadMoreListener,
+    OnRefreshListener {
 
     private LayoutRefreshViewBinding binding;
     private RecyclerView mRecyclerView;
     private SmartRefreshLayout mRefreshLayout;
     private EmptyView mEmptyView;
     private PagedListAdapter<T, ViewHolder> adapter;
+
+    protected M mViewModel;
 
     @Nullable
     @Override
@@ -53,6 +60,24 @@ public abstract class AbsListFragment<T> extends Fragment implements OnLoadMoreL
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
         mRecyclerView.setItemAnimator(null);
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+
+    private void genericViewModel() {
+        //利用 子类传递的 泛型参数实例化出absViewModel 对象。
+        ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
+        Type[] arguments = type.getActualTypeArguments();
+        if (arguments.length > 1) {
+            Type argument = arguments[1];
+            Class modelClaz = ((Class) argument).asSubclass(AbsViewModel.class);
+            mViewModel = (M) ViewModelProviders.of(this).get(modelClaz);
+
+            //触发页面初始化数据加载的逻辑
+            mViewModel.getPageData().observe(this, pagedList -> submitList(pagedList));
+
+            //监听分页时有无更多数据,以决定是否关闭上拉加载的动画
+            mViewModel.getBoundaryPageData().observe(this, hasData -> finishRefresh(hasData));
+        }
     }
 
     // 更新数据

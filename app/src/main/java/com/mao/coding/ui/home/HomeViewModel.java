@@ -77,6 +77,7 @@ public class HomeViewModel extends AbsViewModel<Feed> {
             request.execute(new JsonCallback<List<Feed>>() {
                 @Override
                 public void onCacheSuccess(ApiResponse<List<Feed>> response) {
+                    LogU.d("加载缓存数据"+response.body.size() );
                 }
             });
         }
@@ -85,8 +86,14 @@ public class HomeViewModel extends AbsViewModel<Feed> {
             netRequest.cacheStrategy(key == 0 ? Request.NET_CACHE : Request.NET_ONLY);
             ApiResponse<List<Feed>> response = netRequest.execute();
             List<Feed> data = response.body == null ? Collections.emptyList() : response.body;
+            callback.onResult(data);
 
-            callback
+            // 上拉加载
+            if (key > 0) {
+                // data.size() > 0  true 显示数据  false 关闭上拉加载动画
+                // 通过liveData发送数据 告诉UI层 是否应该主动关闭上拉加载分页的动画
+                getBoundaryPageData().postValue(data.size() > 0);
+            }
 
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
