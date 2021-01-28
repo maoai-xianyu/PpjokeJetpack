@@ -3,6 +3,7 @@
     package="com.mao.coding">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!--  usesCleartextTraffic  允许铭文请求 允许http的接口请求-->
 

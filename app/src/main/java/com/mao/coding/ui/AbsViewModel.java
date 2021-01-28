@@ -16,7 +16,7 @@ import androidx.paging.PagedList.Config;
  * @time 2021/1/21 9:47 AM
  * @Description
  */
-public abstract class  AbsViewModel<T> extends ViewModel {
+public abstract class AbsViewModel<T> extends ViewModel {
 
     private final Config config;
     private final LiveData<PagedList<T>> pageData;

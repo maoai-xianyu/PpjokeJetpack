@@ -50,6 +50,7 @@ dependencies {
 
     //包含了 viewmodel 和 livedata
     api 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
     //或者指明使用viewmodel
     //api "androidx.lifecycle:lifecycle-viewmodel:2.1.0"
     //或者指明使用livedata
@@ -79,8 +80,17 @@ dependencies {
 
     //图片加载
     api 'com.github.bumptech.glide:glide:4.9.0'
-    api 'jp.wasabeef:glide-transformations:4.0.0'
+    api 'jp.wasabeef:glide-transformations:4.0.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+
+    //workmanager
+    api 'androidx.work:work-runtime:2.5.0'
+
+    //gesture imageview
+    //api 'com.github.chrisbanes:PhotoView:2.3.0@aar'
+
+    //aliyun oss
+    api 'com.aliyun.dpa:oss-android-sdk:2.9.5'
 
     //fastjson解析
     api 'com.alibaba:fastjson:1.2.59'

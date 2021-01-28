@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.example.libcommon.R;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -32,21 +33,26 @@ public class EmptyView extends LinearLayout {
     }
 
     public EmptyView(Context context, @Nullable AttributeSet attrs) {
-        this(context, null, 0);
+        this(context, attrs, 0);
     }
 
-    public EmptyView(Context context, @Nullable AttributeSet attrs,
-        int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+
+    public EmptyView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        this(context, attrs, defStyleAttr, 0);
+    }
+
+
+    public EmptyView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int style) {
+        super(context, attrs, defStyleAttr, style);
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER);
-
         LayoutInflater.from(context).inflate(R.layout.layout_empty_view, this, true);
 
         icon = findViewById(R.id.empty_icon);
         title = findViewById(R.id.empty_text);
         action = findViewById(R.id.empty_action);
     }
+
 
     public void setEmptyIcon(@DrawableRes int iconRes) {
         icon.setImageResource(iconRes);

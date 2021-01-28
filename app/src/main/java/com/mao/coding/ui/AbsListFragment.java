@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.libcommon.view.EmptyView;
+import com.mao.coding.R;
 import com.mao.coding.databinding.LayoutRefreshViewBinding;
+import com.mao.coding.utils.LogU;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -17,13 +19,15 @@ import java.lang.reflect.Type;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 /**
  * @author zhangkun
@@ -33,23 +37,23 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Fragment implements OnLoadMoreListener,
     OnRefreshListener {
 
-    private LayoutRefreshViewBinding binding;
-    private RecyclerView mRecyclerView;
-    private SmartRefreshLayout mRefreshLayout;
-    private EmptyView mEmptyView;
-    private PagedListAdapter<T, ViewHolder> adapter;
-
+    protected LayoutRefreshViewBinding binding;
+    protected RecyclerView mRecyclerView;
+    protected SmartRefreshLayout mRefreshLayout;
+    protected EmptyView mEmptyView;
+    protected PagedListAdapter<T, RecyclerView.ViewHolder> adapter;
     protected M mViewModel;
+    protected DividerItemDecoration decoration;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState) {
-
         binding = LayoutRefreshViewBinding.inflate(inflater, container, false);
         mRecyclerView = binding.recyclerView;
         mRefreshLayout = binding.refreshLayout;
         mEmptyView = binding.emptyView;
+
         mRefreshLayout.setEnableLoadMore(true);
         mRefreshLayout.setEnableRefresh(true);
         mRefreshLayout.setOnLoadMoreListener(this);
@@ -59,9 +63,34 @@ public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Frag
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
         mRecyclerView.setItemAnimator(null);
-        return super.onCreateView(inflater, container, savedInstanceState);
+
+        //默认给列表中的Item 一个 10dp的ItemDecoration
+        decoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        decoration.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.list_divider));
+        mRecyclerView.addItemDecoration(decoration);
+
+        afterCreateView();
+        return binding.getRoot();
     }
 
+    protected abstract void afterCreateView();
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
+
+        Type[] arguments = type.getActualTypeArguments();
+        if (arguments.length > 1) {
+            Type argument = arguments[1];
+            Class modelClaz = ((Class) (argument)).asSubclass(AbsViewModel.class);
+            mViewModel = (M) new ViewModelProvider(this).get(modelClaz);
+            mViewModel.getPageData().observe(this, pagedList -> submitList(pagedList));
+            mViewModel.getBoundaryPageData().observe(this, hasData -> finishRefresh(hasData));
+        }
+    }
 
     private void genericViewModel() {
         //利用 子类传递的 泛型参数实例化出absViewModel 对象。
@@ -70,7 +99,8 @@ public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Frag
         if (arguments.length > 1) {
             Type argument = arguments[1];
             Class modelClaz = ((Class) argument).asSubclass(AbsViewModel.class);
-            mViewModel = (M) ViewModelProviders.of(this).get(modelClaz);
+            //mViewModel = (M) ViewModelProviders.of(this).get(modelClaz);
+            mViewModel = (M) new ViewModelProvider(this).get(modelClaz);
 
             //触发页面初始化数据加载的逻辑
             mViewModel.getPageData().observe(this, pagedList -> submitList(pagedList));
@@ -92,6 +122,7 @@ public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Frag
 
     // 更新状态
     public void finishRefresh(boolean hasData) {
+        LogU.d(" hasData " + hasData);
         PagedList<T> currentList = adapter.getCurrentList();
         hasData = hasData || (currentList != null && currentList.size() > 0);
         RefreshState state = mRefreshLayout.getState();

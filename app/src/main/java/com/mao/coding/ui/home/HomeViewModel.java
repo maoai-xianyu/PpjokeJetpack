@@ -68,7 +68,7 @@ public class HomeViewModel extends AbsViewModel<Feed> {
             .addParam("feedType", null)
             .addParam("userId", 0)
             .addParam("feedId", key)
-            .addParam("pageCount", 0)
+            .addParam("pageCount", 10)
             .responseType(new TypeReference<ArrayList<Feed>>() {
             }.getType());
 
@@ -97,6 +97,7 @@ public class HomeViewModel extends AbsViewModel<Feed> {
 
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
+            LogU.e("报错  "+e.toString());
         }
     }
 
