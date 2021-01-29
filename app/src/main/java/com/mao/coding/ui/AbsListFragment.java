@@ -138,7 +138,11 @@ public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Frag
         }
     }
 
-    // 设置数据源
+    /**
+     *  因而 我们在 onCreateView的时候 创建了 PagedListAdapter
+     *  所以，如果arguments 有参数需要传递到Adapter 中，那么需要在getAdapter()方法中取出参数。
+     * @return
+     */
     public abstract PagedListAdapter<T, RecyclerView.ViewHolder> getAdapter();
 
 }

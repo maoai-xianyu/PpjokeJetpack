@@ -39,8 +39,15 @@ public abstract class AbsViewModel<T> extends ViewModel {
             .setBoundaryCallback(callback)  // 监听PageList数据加载的状态，之后
             .build();
 
-        // 触发加载数据
-        //pageData.observe();
+
+        // 订阅后，执行数据的加载
+        /*pageData.observe(ower, new Observer<PagedList<T>>() {
+            @Override
+            public void onChanged(PagedList<T> pagedList) {
+
+            }
+        });*/
+
     }
 
 
