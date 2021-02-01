@@ -6,6 +6,8 @@ import com.mao.libnavannotation.FragmentDestination;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
+import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 
 @FragmentDestination(pageUrl = "main/tabs/home", asStarter = true)
@@ -17,6 +19,13 @@ public class HomeFragment extends AbsListFragment<Feed, HomeViewModel> {
 
     @Override
     protected void afterCreateView() {
+
+        mViewModel.getCacheLiveData().observe(this, new Observer<PagedList<Feed>>() {
+            @Override
+            public void onChanged(PagedList<Feed> feeds) {
+                adapter.submitList(feeds);
+            }
+        });
 
     }
 
