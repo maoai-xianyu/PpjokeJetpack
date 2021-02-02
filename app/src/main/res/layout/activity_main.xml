@@ -3,8 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="?attr/actionBarSize">
+    android:layout_height="match_parent">
+
+
+
+    <!--
+   当使用自己的生成的注解的形式就不需要使用
+   app:navGraph="@navigation/mobile_navigation"
+   在 NavGraphBuilder 解析注解生成器生成的文件中的数据，用于导航 NavGraph
+   -->
+
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <com.mao.coding.ui.view.AppBottomBar
         android:id="@+id/nav_view"
@@ -18,23 +38,5 @@
         app:layout_constraintRight_toRightOf="parent" />
 
 
-    <!--
-
-    当使用自己的生成的注解的形式就不需要使用
-    app:navGraph="@navigation/mobile_navigation"
-    在 NavGraphBuilder 解析注解生成器生成的文件中的数据，用于导航 NavGraph
-
-    -->
-
-    <fragment
-        android:id="@+id/nav_host_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
