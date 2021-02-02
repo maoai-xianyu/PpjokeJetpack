@@ -24,29 +24,18 @@
     </data>
 
 
-    <!--<com.example.libcommon.view.CornerFrameLayout
+    <com.example.libcommon.view.CornerFrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/dp_16"
         android:layout_marginRight="@dimen/dp_16"
         android:background="@color/color_gray"
-        android:orientation="vertical"
         android:paddingLeft="@dimen/dp_10"
         android:paddingRight="@dimen/dp_10"
         android:paddingBottom="@dimen/dp_10"
         android:visibility="@{comment==null?View.GONE:View.VISIBLE}"
         app:clip_radius="6dp"
-        app:clip_side="all">-->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/dp_16"
-        android:layout_marginRight="@dimen/dp_16"
-        android:background="@color/color_gray"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/dp_10"
-        android:paddingRight="@dimen/dp_10"
-        android:paddingBottom="@dimen/dp_10">
+        app:clip_side="all">
 
 
         <ImageView
@@ -165,5 +154,5 @@
             </FrameLayout>
 
         </LinearLayout>
-    </FrameLayout>
+    </com.example.libcommon.view.CornerFrameLayout>
 </layout>

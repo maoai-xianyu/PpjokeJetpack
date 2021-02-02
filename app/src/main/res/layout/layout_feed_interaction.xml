@@ -43,7 +43,8 @@
             app:iconTint="@{feed.ugc.hasLiked?@color/color_theme:@color/color_3d3}"
             tools:icon="@drawable/icon_cell_like"
             tools:iconTint="@color/color_3d3"
-            tools:text="1000"/>
+            tools:text="1000"
+            tools:textColor="@color/color_3d3"/>
 
 
         <com.google.android.material.button.MaterialButton

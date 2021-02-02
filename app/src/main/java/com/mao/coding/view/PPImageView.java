@@ -44,7 +44,7 @@ public class PPImageView extends AppCompatImageView {
         setImageUrl(this, imageUrl, false);
     }
 
-    @BindingAdapter(value = {"image_url", "isCircle"},requireAll = true)
+    @BindingAdapter(value = {"image_url", "isCircle"})
     public static void setImageUrl(PPImageView view, String imageUrl, boolean isCircle) {
         view.setImageUrl(view, imageUrl, isCircle, 0);
     }
@@ -66,7 +66,7 @@ public class PPImageView extends AppCompatImageView {
 
 
     public void bindData(int widthPx, int heightPx, int marginLeft, String imageUrl) {
-        bindData(widthPx, heightPx, marginLeft, PixUtils.getScreenWidth(), PixUtils.getScreenWidth () , imageUrl);
+        bindData(widthPx, heightPx, marginLeft, PixUtils.getScreenWidth(), PixUtils.getScreenWidth(), imageUrl);
     }
 
     public void bindData(int widthPx, int heightPx, final int marginLeft, final int maxWidth, final int maxHeight,

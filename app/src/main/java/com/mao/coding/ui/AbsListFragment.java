@@ -22,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -69,27 +68,8 @@ public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Frag
         decoration.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.list_divider));
         mRecyclerView.addItemDecoration(decoration);
 
-        afterCreateView();
+        genericViewModel();
         return binding.getRoot();
-    }
-
-    protected abstract void afterCreateView();
-
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
-
-        Type[] arguments = type.getActualTypeArguments();
-        if (arguments.length > 1) {
-            Type argument = arguments[1];
-            Class modelClaz = ((Class) (argument)).asSubclass(AbsViewModel.class);
-            mViewModel = (M) new ViewModelProvider(this).get(modelClaz);
-            mViewModel.getPageData().observe(this, pagedList -> submitList(pagedList));
-            mViewModel.getBoundaryPageData().observe(this, hasData -> finishRefresh(hasData));
-        }
     }
 
     private void genericViewModel() {
@@ -139,9 +119,8 @@ public abstract class AbsListFragment<T, M extends AbsViewModel<T>> extends Frag
     }
 
     /**
-     *  因而 我们在 onCreateView的时候 创建了 PagedListAdapter
-     *  所以，如果arguments 有参数需要传递到Adapter 中，那么需要在getAdapter()方法中取出参数。
-     * @return
+     * 因而 我们在 onCreateView的时候 创建了 PagedListAdapter
+     * 所以，如果arguments 有参数需要传递到Adapter 中，那么需要在getAdapter()方法中取出参数。
      */
     public abstract PagedListAdapter<T, RecyclerView.ViewHolder> getAdapter();
 

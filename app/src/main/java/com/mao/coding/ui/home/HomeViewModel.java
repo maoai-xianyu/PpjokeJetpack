@@ -9,7 +9,7 @@ import com.example.libnetwork.JsonCallback;
 import com.example.libnetwork.Request;
 import com.mao.coding.model.Feed;
 import com.mao.coding.ui.AbsViewModel;
-import com.mao.coding.ui.MutableDataSource;
+import com.mao.coding.ui.MutablePageKeyedDataSource;
 import com.mao.coding.utils.LogU;
 
 import java.util.ArrayList;
@@ -28,26 +28,60 @@ public class HomeViewModel extends AbsViewModel<Feed> {
 
 
     private volatile boolean witchCache = true;
-    private MutableLiveData<PagedList<Feed>> cacheLiveData  = new MutableLiveData<>();
-    private AtomicBoolean loadAfter = new AtomicBoolean(false);
+    private MutableLiveData<PagedList<Feed>> cacheLiveData = new MutableLiveData<>();
+    private AtomicBoolean loadAfter = new AtomicBoolean(false); // 同步位的标记，pagelist 帮我们做了上拉加载，就不需要需要我们自己是做了
 
 
     @Override
     public DataSource createDataSource() {
-        return mDataSource;
+        return new FeedDataSource();
     }
 
     public MutableLiveData<PagedList<Feed>> getCacheLiveData() {
         return cacheLiveData;
     }
 
+    class FeedDataSource extends ItemKeyedDataSource<Integer, Feed> {
+
+        @Override
+        public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Feed> callback) {
+            //加载初始化数据的 执行在主线程
+            LogU.d("当前线程 loadInitial " + Thread.currentThread());
+            loadData(0, params.requestedLoadSize, callback);
+            witchCache = false;
+        }
+
+        @Override
+        public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Feed> callback) {
+            //向后加载分页数据的  执行在线程
+            LogU.d("当前线程 loadAfter " + Thread.currentThread());
+            loadData(params.key, params.requestedLoadSize, callback);
+        }
+
+        @Override
+        public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Feed> callback) {
+            //能够向前加载数据的,比如进入页面的，加载的是的第三页的数据，向上翻动的时候会加载第二页和第一页的数据。一般用不到
+            LogU.d("当前线程 loadBefore " + Thread.currentThread());
+            callback.onResult(Collections.emptyList());
+        }
+
+        @NonNull
+        @Override
+        public Integer getKey(@NonNull Feed item) {
+            //通过最后一条的item的信息，返回Integer对象
+            return item.id;
+        }
+    }
+
+
+    // TODO: 2021/2/2 匿名内部类，在刷新的时候，有问题，转为上面的内部类。
     ItemKeyedDataSource<Integer, Feed> mDataSource = new ItemKeyedDataSource<Integer, Feed>() {
         @Override
         public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Feed> callback) {
             //加载初始化数据的 执行在主线程
             LogU.d("当前线程 loadInitial " + Thread.currentThread());
 
-            loadData(0, callback);
+            loadData(0, params.requestedLoadSize, callback);
             witchCache = false;
 
         }
@@ -56,7 +90,7 @@ public class HomeViewModel extends AbsViewModel<Feed> {
         public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Feed> callback) {
             //向后加载分页数据的  执行在线程
             LogU.d("当前线程 loadAfter " + Thread.currentThread());
-
+            loadData(params.key, params.requestedLoadSize, callback);
         }
 
         @Override
@@ -74,7 +108,8 @@ public class HomeViewModel extends AbsViewModel<Feed> {
         }
     };
 
-    private void loadData(int key, ItemKeyedDataSource.LoadCallback<Feed> callback) {
+    private void loadData(int key, int count, ItemKeyedDataSource.LoadCallback<Feed> callback) {
+        LogU.d("home loadData" + "key = " + key + " count = " + count);
         if (key > 0) {
             loadAfter.set(true);
         }
@@ -83,7 +118,7 @@ public class HomeViewModel extends AbsViewModel<Feed> {
             .addParam("feedType", null)
             .addParam("userId", 0)
             .addParam("feedId", key)
-            .addParam("pageCount", 10)
+            .addParam("pageCount", count)
             .responseType(new TypeReference<ArrayList<Feed>>() {
             }.getType());
 
@@ -92,11 +127,10 @@ public class HomeViewModel extends AbsViewModel<Feed> {
             request.execute(new JsonCallback<List<Feed>>() {
                 @Override
                 public void onCacheSuccess(ApiResponse<List<Feed>> response) {
-                    LogU.d("加载缓存数据" + response.body.size());
+                    LogU.d("loadData 加载缓存数据" + response.body.size());
                     List<Feed> body = response.body;
-                    MutableDataSource<Integer, Feed> dataSource = new MutableDataSource<>();
-                    dataSource.data.addAll(body) ;
-
+                    MutablePageKeyedDataSource<Feed> dataSource = new MutablePageKeyedDataSource<>();
+                    dataSource.data.addAll(body);
                     PagedList<Feed> pagedList = dataSource.buildNewPagedList(config);
                     cacheLiveData.postValue(pagedList);
 
@@ -122,6 +156,8 @@ public class HomeViewModel extends AbsViewModel<Feed> {
             e.printStackTrace();
             LogU.e("报错  " + e.toString());
         }
+
+        LogU.e("loadData: key:" + key);
     }
 
 

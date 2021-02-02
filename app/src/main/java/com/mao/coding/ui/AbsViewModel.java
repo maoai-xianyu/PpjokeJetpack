@@ -26,8 +26,8 @@ public abstract class AbsViewModel<T> extends ViewModel {
 
     public AbsViewModel() {
         config = new Config.Builder()
-            .setPageSize(10) // 分页请求的数据
-            .setInitialLoadSizeHint(12) // 第一次初始化的数据，不想初始化数据加载完之后，立马加载下一页数据，需要把 setInitialLoadSizeHint 的值改大
+            .setPageSize(1) // 分页请求的数据
+            .setInitialLoadSizeHint(2) // 第一次初始化的数据，不想初始化数据加载完之后，立马加载下一页数据，需要把 setInitialLoadSizeHint 的值改大
             // .setMaxSize(100) // 一般都不调用
             // .setEnablePlaceholders(false)  // 占位符数据,需要知道要设置加载多少条数据
             // .setPrefetchDistance() // 距离屏幕底部还有几个条目，开始预加载下一页,理论上是屏幕可见item的数倍。setPageSize =10 那么 setPrefetchDistance 也是 10

@@ -26,7 +26,7 @@ public class FeedAdapter extends PagedListAdapter<Feed, FeedAdapter.ViewHolder> 
     private final Context mContext;
     private String mCategory;
 
-    public FeedAdapter(Context context,String category) {
+    public FeedAdapter(Context context, String category) {
         super(new ItemCallback<Feed>() {
 
             // 两个item 是不是同一个
@@ -59,9 +59,9 @@ public class FeedAdapter extends PagedListAdapter<Feed, FeedAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ViewDataBinding mBinding;
         if (viewType == Feed.TYPE_IMAGE_TEXT) {
-            mBinding = LayoutFeedTypeImageBinding.inflate(inflater);
+            mBinding = LayoutFeedTypeImageBinding.inflate(inflater, parent, false);
         } else {
-            mBinding = LayoutFeedTypeVideoBinding.inflate(inflater);
+            mBinding = LayoutFeedTypeVideoBinding.inflate(inflater, parent, false);
         }
         return new ViewHolder(mBinding.getRoot(), mBinding);
     }
@@ -83,14 +83,24 @@ public class FeedAdapter extends PagedListAdapter<Feed, FeedAdapter.ViewHolder> 
         }
 
         public void bindData(Feed item) {
+
+            //这里之所以手动绑定数据的原因是 图片 和视频区域都是需要计算的
+            //而dataBinding的执行默认是延迟一帧的。
+            //当列表上下滑动的时候 ，会明显的看到宽高尺寸不对称的问题
+            mBinding.setVariable(com.mao.coding.BR.feed, item);
+            //mBinding.setVariable(BR.lifeCycleOwner, mContext);
             if (mBinding instanceof LayoutFeedTypeImageBinding) {
                 LayoutFeedTypeImageBinding typeImageBinding = (LayoutFeedTypeImageBinding) mBinding;
-                typeImageBinding.setFeed(item);
-                typeImageBinding.feedImage.bindData(item.width, item.height, 16, item.cover) ;
-            }else {
+                typeImageBinding.feedImage.bindData(item.width, item.height, 16, item.cover);
+                //typeImageBinding.setFeed(item);
+                //typeImageBinding.interactionBinding.setLifeCycleOwner((LifecycleOwner) mContext);
+                //typeImageBinding.setLifeCycleOwner((LifecycleOwner) mContext);
+            } else {
                 LayoutFeedTypeVideoBinding typeVideoBinding = (LayoutFeedTypeVideoBinding) mBinding;
-                typeVideoBinding.setFeed(item);
-                typeVideoBinding.listPlayerView.bindData(mCategory,item.width,item.height,item.cover,item.url);
+                typeVideoBinding.listPlayerView.bindData(mCategory, item.width, item.height, item.cover, item.url);
+                //typeVideoBinding.setFeed(item);
+                //typeVideoBinding.interactionBinding.setLifeCycleOwner((LifecycleOwner) mContext);
+                //typeVideoBinding.setLifeCycleOwner((LifecycleOwner) mContext);
             }
         }
     }

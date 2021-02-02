@@ -4,14 +4,15 @@
 
     <data>
 
-        <variable
-            name="feed"
-            type="com.mao.coding.model.Feed" />
+        <import type="com.mao.coding.model.Feed" />
 
         <variable
             name="lifeCycleOwner"
             type="androidx.lifecycle.LifecycleOwner" />
 
+        <variable
+            name="feed"
+            type="Feed" />
     </data>
 
     <LinearLayout
